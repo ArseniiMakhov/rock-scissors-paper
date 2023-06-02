@@ -34,7 +34,9 @@ function hasDuplicates(array) {
 // Play
 class Play {
     static letsPlay() {
+        const compMove = Computer.getComputerMove();
         const key = Computer.getKey();
+        Computer.showHMAC(key, input[compMove]);
         console.log('Available moves:');
         for (var i = 0; i < input.length; i++) {
             console.log(`${i + 1} - ${input[i]}`);
@@ -47,7 +49,7 @@ class Play {
                     rl.close();
                     return;
                 } else if (move === '?') {
-                    Table.getTable(input);
+                    Table.showTable(input);
                     askUserMove();
                     return;
                 } else if (move >= input.length + 1) {
@@ -56,20 +58,19 @@ class Play {
                     return;
                 } else {
                     console.log(`Your move: ${input[move - 1]}`);
-                    const compMove = Computer.getComputerMove();
                     console.log(`Computer move: ${input[compMove]}`);
                     switch (Rules.getWinner(move - 1, compMove, input)) {
                         case 0:
                             console.log("It's a draw");
-                            Computer.getFinalHex(key, compMove);
+                            console.log(key);
                             break;
                         case 1:
                             console.log('You Win!');
-                            Computer.getFinalHex(key, compMove);
+                            console.log(key);
                             break;
                         case -1:
                             console.log('You Lose.');
-                            Computer.getFinalHex(key, compMove);
+                            console.log(key);
                             break;
                     }
                     rl.close();
@@ -84,7 +85,6 @@ class Play {
 class Computer {
     static getKey() {
         const key = crypto.randomBytes(32).toString('hex');
-        console.log(key);
         return key;
     }
 
@@ -93,10 +93,9 @@ class Computer {
         return computer;
     }
 
-    static getFinalHex(key, move) {
-        const hash = crypto.createHash("SHA3-256");
-        const finalHex = hash.update(key, move).digest("hex");
-        console.log(finalHex);
+    static showHMAC(key, move) {
+        const hmac = crypto.createHmac('sha256', key).update(move).digest('hex');
+        console.log(hmac);
     }
 }
 
@@ -121,7 +120,7 @@ class Rules {
 
 // Table generator
 class Table {
-    static getTable(input) {
+    static showTable(input) {
         let arr = [];
         for (let i = 0; i <= input.length && i <= 5; i++) {
             arr[i] = [];
@@ -144,5 +143,4 @@ class Table {
         return console.log(table(arr));
     }
 }
-
 Play.letsPlay();
